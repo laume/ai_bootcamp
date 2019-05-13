@@ -37,24 +37,21 @@ class Hand:
 
     def combination(self):
         if self.is_royal_flush():
-            return "Royal Flush! {}".format(self.cards)
+            return 100
         if self.is_straight_flush():
-            return "Straight flush! {}".format(self.cards)
+            return 90
         if self.is_full_house():
-            return "Full house! {}".format(self.cards)
+            return 80
         if self.is_flush():
-            return "Flush! {}".format(self.cards)
+            return 70
         if self.is_straight():
-            return "Straight {}".format(self.cards)
+            return 60
         if self.is_3_of_a_kind():
-            return "Three of a kind! {}".format(self.cards)
+            return 50
         if self.is_pair():
-            return "Pair! {}".format(self.cards)
+            return 40
         else:
-            return 'High card {}'.format(self.cards)
-
-    def __repr__(self):
-        return " ".join(str(card) for card in self.cards)
+            return 30
 
     def is_pair(self):
         ranks = list(map(lambda card: card.rank, self.cards))
@@ -85,6 +82,12 @@ class Hand:
 
     def is_royal_flush(self):
         return self.cards[0].value == 10 and self.is_straight() and self.is_flush()
+
+    def __repr__(self):
+        return " ".join(str(card) for card in self.cards)
+
+    def __lt__(self, other):
+        return self.combination() < other.combination()
 
 
 class Player:
@@ -121,10 +124,9 @@ class Table:
         self.pot = 0
         self.deck.shuffle()
 
-        # if self.player.bet(10):
-        # self.pot += 10 * 2
-
-        self.deal_hands()
+        if self.player.bet(10):
+            self.pot += 10 * 2
+            self.deal_hands()
 
     def deal_hands(self):
         self.player_hand.append(self.deck.deal_card())
@@ -139,6 +141,22 @@ class Table:
         self.board_cards.append(self.deck.deal_card())
         self.board_cards.append(self.deck.deal_card())
 
+    def resolve_hands(self):
+        best_dealer_hand = self.best_hand(table.dealer_hand + table.board_cards)
+        best_player_hand = self.best_hand(table.player_hand + table.board_cards)
+
+        print(best_dealer_hand)
+        print(best_player_hand)
+
+        if best_dealer_hand > best_player_hand:
+            print("Dealer wins!")
+        else:
+            print("Player wins!")
+
+    # TODO resolving hands without best kicker
+    def best_hand(self, cards):
+        return max([Hand(cards) for cards in itertools.combinations(cards, 5)])
+
 
 iteration = 0
 playing = True
@@ -148,16 +166,10 @@ table = Table(p1)
 
 while playing:
     table.new_game()
-    a = table.player_hand + table.board_cards
 
-    hands = [Hand(cards) for cards in itertools.combinations(a, 5)]
+    table.resolve_hands()
 
-    for hand in hands:
-        if hand.is_full_house():
-            print("{} after {} iterations".format(hand, iteration))
-            playing = False
-
-    iteration += 1
+    playing = False
 
 # print("Current pot is ", table.pot)
 # print("--------------")
