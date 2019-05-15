@@ -1,6 +1,8 @@
 import hand_resolver
+import time
 from hand import Hand
 from deck import Deck
+
 
 class Table:
 
@@ -43,10 +45,18 @@ class Table:
         bet_amount = Table.ante * 2
         if self.player.bet(bet_amount):
             self.pot += bet_amount * 2
+            time.sleep(2)
 
             # deal Turn and River cards
-            self.board_cards.append(self.deck.deal_card())
-            self.board_cards.append(self.deck.deal_card())
+            turn_card = self.deck.deal_card()
+            self.board_cards.append(turn_card)
+            print(f"Turn card is {self.board_cards}")
+            time.sleep(3)
+
+            river_card = self.deck.deal_card()
+            self.board_cards.append(river_card)
+            print(f"River card is {self.board_cards}")
+            time.sleep(3)
 
     def player_folds(self) -> None:
         # do nothing yet

@@ -3,8 +3,13 @@ class Hand:
         self.cards = sorted(list(cards))
         self.rank = 0
         self.name = ''
+        self.score = 0
 
         self._combination()
+        self.score = self.rank
+
+        for card in cards:
+            self.score += card.value
 
     def _combination(self) -> None:
         if self._is_royal_flush():
@@ -69,4 +74,4 @@ class Hand:
         return " ".join(str(card) for card in self.cards)
 
     def __lt__(self, other):
-        return self.rank < other.rank
+        return self.score < other.score
