@@ -1,99 +1,59 @@
-import itertools
-from hand import Hand
-from deck import Deck
+from player import Player
+from table import Table
+import os
+import time
 
-
-class Player:
-
-    def __init__(self, name):
-        self.chips = 100
-        self.name = name
-
-    def bet(self, amount):
-        if amount > self.chips:
-            print("Sorry, your bet can't exceed", self.chips)
-            return False
-        else:
-            self.chips -= amount
-            print("{} has {} chips remaining".format(self.name, self.chips))
-            return True
-
-
-class Table:
-
-    def __init__(self, player):
-        self.pot = 0
-        self.player_hand = []
-        self.dealer_hand = []
-        self.board_cards = []
-        self.deck = Deck()
-        self.player = player
-
-    def new_game(self):
-        self.deck = Deck()
-        self.player_hand.clear()
-        self.dealer_hand.clear()
-        self.board_cards.clear()
-        self.pot = 0
-        self.deck.shuffle()
-
-        if self.player.bet(10):
-            self.pot += 10 * 2
-            self.deal_hands()
-
-    def deal_hands(self):
-        self.player_hand.append(self.deck.deal_card())
-        self.dealer_hand.append(self.deck.deal_card())
-
-        self.player_hand.append(self.deck.deal_card())
-        self.dealer_hand.append(self.deck.deal_card())
-
-        self.board_cards.append(self.deck.deal_card())
-        self.board_cards.append(self.deck.deal_card())
-        self.board_cards.append(self.deck.deal_card())
-        self.board_cards.append(self.deck.deal_card())
-        self.board_cards.append(self.deck.deal_card())
-
-    def resolve_hands(self):
-        best_dealer_hand = self.best_hand(table.dealer_hand + table.board_cards)
-        best_player_hand = self.best_hand(table.player_hand + table.board_cards)
-
-        print(f"Best dealer hand: {best_dealer_hand} - {best_dealer_hand.name()}")
-        print(f"Best player hand: {best_player_hand} - {best_player_hand.name()}")
-
-        if best_dealer_hand == best_player_hand:
-            print("Split")
-        elif best_dealer_hand > best_player_hand:
-            print(f"Dealer wins with a {best_dealer_hand.name()}!")
-        else:
-            print(f"Player wins with a {best_player_hand.name()}")
-
-    # TODO resolving hands without best kicker for now
-    def best_hand(self, cards):
-        return max([Hand(cards) for cards in itertools.combinations(cards, 5)])
-
-
-iteration = 0
 playing = True
 
-p1 = Player("Martynas")
+p1 = Player("Martynas", 1000)
 table = Table(p1)
+
+
+def after_flop() -> bool:
+    action = input("Do you want to (b)et or (f)old?: ")
+
+    if action.lower() == 'f':
+        return False
+    if action.lower() == 'b':
+        return True
+    else:
+        print(f"Invalid action: {action}. Only 'f' (for Fold) or 'b' (for Bet) are allowed")
+        return after_flop()
+
+
+def want_to_play_again() -> bool:
+    play_again = input("Play again? (y/n): ")
+
+    if play_again == 'n':
+        return False
+    else:
+        return True
+
+
+def clear_screen():
+    os.system('clear')
+
 
 while playing:
     table.new_game()
 
-    table.resolve_hands()
+    print(table)
 
-    playing = False
+    bet = after_flop()
+    if bet:
+        print(f"{p1.name} bets.")
+        table.player_bets()
+        table.resolve_winner()
+        time.sleep(3)
+    else:
+        table.player_folds()
+        print(f"{p1.name} folds.")
+        time.sleep(1)
 
-# print("Current pot is ", table.pot)
-# print("--------------")
-# print("Player hand: ", table.player_hand)
-# print("On the table: ", table.board_cards)
+    if not want_to_play_again():
+        playing = False
+    else:
+        clear_screen()
 
-# a = table.player_hand + table.board_cards
-
-# hands = [Hand(cards) for cards in itertools.combinations(a, 5)]
-
-# for hand in hands:
-# print(hand.combination())
+clear_screen()
+print("Thank you for playing!")
