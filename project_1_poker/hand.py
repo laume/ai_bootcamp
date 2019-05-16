@@ -18,7 +18,7 @@ class Hand:
 
     def _score_combination(self) -> None:
         if self.is_royal_flush():
-            self.rank = 1000
+            self.rank = 10000
             self.name = "Royal Flush"
         elif self.is_straight_flush():
             self.rank = 9000
