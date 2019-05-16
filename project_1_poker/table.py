@@ -38,10 +38,10 @@ class Table:
 
     def deal_hands(self):
         # deal player and dealer hands
-        for i in range(2):
-            card = self.deck.deal_card()
-            card.hidden = True
-            self.dealer_hand.append(card)
+        card = self.deck.deal_card()
+        card.hidden = True
+        self.dealer_hand.append(card)
+        self.dealer_hand.append(self.deck.deal_card())
 
         self.player_hand.append(self.deck.deal_card())
         self.player_hand.append(self.deck.deal_card())
