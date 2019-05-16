@@ -1,5 +1,6 @@
 from typing import Tuple, List
 
+import card_printer
 import hand_resolver
 import time
 
@@ -16,7 +17,7 @@ class Table:
         self.pot = 0
         self.player_hand = []
         self.dealer_hand: List[Card] = []
-        self.board_cards: List[Card] = []
+        self.community_cards: List[Card] = []
         self.deck = Deck()
         self.player = player
         self.dealer = Player("Dealer", 0)
@@ -27,7 +28,7 @@ class Table:
         self.deck = Deck()
         self.player_hand.clear()
         self.dealer_hand.clear()
-        self.board_cards.clear()
+        self.community_cards.clear()
         self.pot = 0
         self.deck.shuffle()
 
@@ -46,9 +47,9 @@ class Table:
         self.player_hand.append(self.deck.deal_card())
 
         # deal Flop cards
-        self.board_cards.append(self.deck.deal_card())
-        self.board_cards.append(self.deck.deal_card())
-        self.board_cards.append(self.deck.deal_card())
+        self.community_cards.append(self.deck.deal_card())
+        self.community_cards.append(self.deck.deal_card())
+        self.community_cards.append(self.deck.deal_card())
 
     def player_bets(self) -> None:
         bet_amount = Table.ante * 2
@@ -58,14 +59,14 @@ class Table:
 
             # deal Turn and River cards
             turn_card = self.deck.deal_card()
-            self.board_cards.append(turn_card)
-            print(f"Turn card is {self.board_cards}")
-            time.sleep(3)
+            self.community_cards.append(turn_card)
+            print(f"Turn card is {self.community_cards}")
+            time.sleep(1)
 
             river_card = self.deck.deal_card()
-            self.board_cards.append(river_card)
-            print(f"River card is {self.board_cards}")
-            time.sleep(3)
+            self.community_cards.append(river_card)
+            print(f"River card is {self.community_cards}")
+            time.sleep(1)
 
     def player_folds(self) -> None:
         # do nothing yet
@@ -75,8 +76,8 @@ class Table:
         for card in self.dealer_hand:
             card.hidden = False
 
-        best_dealer_hand = hand_resolver.resolve_best_hand(self.dealer_hand + self.board_cards)
-        best_player_hand = hand_resolver.resolve_best_hand(self.player_hand + self.board_cards)
+        best_dealer_hand = hand_resolver.resolve_best_hand(self.dealer_hand + self.community_cards)
+        best_player_hand = hand_resolver.resolve_best_hand(self.player_hand + self.community_cards)
 
         print(f"Best dealer hand: {best_dealer_hand} - {best_dealer_hand.name}")
         print(f"Best player hand: {best_player_hand} - {best_player_hand.name}")
@@ -91,13 +92,20 @@ class Table:
             print(f"Player wins {self.pot} with a {best_player_hand.name}. And has total of {self.player.chips}.")
 
     def dealer_qualifies(self) -> bool:
-        dealer_hand = Hand(tuple(self.dealer_hand + self.board_cards))
-        if dealer_hand.is_pair():
+        if hand_resolver.is_pair_of_4_or_better(self.dealer_hand + self.community_cards):
             return True
         else:
             self.player.credit(self.pot)
             print("Dealer folds. Player wins.")
             return False
 
-    def __repr__(self) -> str:
-        return f"Dealer: \t{self.dealer_hand} \nBoard: \t\t{self.board_cards} \n{self.player.name} \t{self.player_hand}"
+    def print_table(self) -> None:
+        print("Dealer:")
+        print(card_printer.ascii_version_of_hidden_card(self.dealer_hand))
+
+        print("Board")
+        print(card_printer.ascii_version_of_card(self.community_cards))
+
+        print(f"{self.player.name}:")
+        print(card_printer.ascii_version_of_card(self.player_hand))
+

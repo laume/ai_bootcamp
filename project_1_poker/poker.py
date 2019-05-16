@@ -60,8 +60,7 @@ def start_game():
     playing = True
     while playing:
         table.new_game()
-
-        print(table)
+        table.print_table()
 
         if not table.dealer_qualifies():
             time.sleep(2)

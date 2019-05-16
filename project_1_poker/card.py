@@ -33,13 +33,13 @@ class Card:
         self.hidden = False
 
     def __repr__(self) -> str:
-        return 'X' if self.hidden else self.rank + self._colorized_suit
+        return 'X' if self.hidden else self.rank + self.colorized_suit
 
     def __lt__(self, other) -> bool:
         return self.value < other.value
 
     @property
-    def _colorized_suit(self) -> str:
+    def colorized_suit(self) -> str:
         return Card.suit_colors[self.suit] + self.suit + Style.RESET_ALL
 
     @classmethod
