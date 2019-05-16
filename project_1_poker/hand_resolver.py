@@ -13,9 +13,7 @@ def resolve_best_hand(cards: List[Card]) -> Hand:
     return max(hands)
 
 
-def is_pair_of_4_or_better(cards: List[Card]) -> bool:
-    hand = Hand(tuple(cards))
-
+def is_pair_of_4_or_better(hand: Hand) -> bool:
     if hand.rank >= 3000:
         return True  # better than pair
 

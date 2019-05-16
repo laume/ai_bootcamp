@@ -37,6 +37,7 @@ class Table:
         if self.player.bet(Table.ante):
             self.ante = Table.ante
             self.deal_hands()
+            print(f"New game. Ante is {self.ante}")
 
     def deal_hands(self):
         # deal player and dealer hands
@@ -57,6 +58,7 @@ class Table:
         bet_amount = Table.ante * 2
         if self.player.bet(bet_amount):
             self.player_bet = bet_amount
+            print(f"{self.player.name} bets {self.player_bet}")
             time.sleep(1)
 
     def draw_turn_card(self) -> None:
@@ -72,38 +74,40 @@ class Table:
         pass
 
     def resolve_winner(self):
-        for card in self.dealer_hand:
-            card.hidden = False
-
         best_dealer_hand = hand_resolver.resolve_best_hand(self.dealer_hand + self.community_cards)
         best_player_hand = hand_resolver.resolve_best_hand(self.player_hand + self.community_cards)
 
-        print(f"Best dealer hand: {best_dealer_hand} - {best_dealer_hand.name}")
-        print(f"Best player hand: {best_player_hand} - {best_player_hand.name}")
+        if not hand_resolver.is_pair_of_4_or_better(best_dealer_hand):
+            #  player gets his bet back and Ante PayOff
+            ante_payoff = Table.win_amount(best_player_hand, self.ante)
+            self.player.credit(ante_payoff + self.player_bet)
+            print(f"Dealer folds. Player wins {ante_payoff}")
+        else:
+            for card in self.dealer_hand:
+                card.hidden = False
 
-        if best_dealer_hand.score == best_player_hand.score:
+            self.check_winner(best_dealer_hand, best_player_hand)
+
+    def check_winner(self, dealer_hand: Hand, player_hand: Hand):
+        print(f"Best dealer hand: {dealer_hand} - {dealer_hand.name}")
+        print(f"Best player hand: {player_hand} - {player_hand.name}")
+
+        if dealer_hand.score == player_hand.score:
             self.player.credit(self.ante + self.player_bet)
             print("It'a a split!")
-        elif best_dealer_hand.score > best_player_hand.score:
-            print(f"Dealer wins with a {best_dealer_hand.name}!")
+        elif dealer_hand.score > player_hand.score:
+            print(f"Dealer wins with a {player_hand.name}!")
         else:
-            win_amount = Table.win_amount(best_player_hand, self.player_bet) + self.player_bet
-            self.player.credit(win_amount + self.ante * 2)
-            print(f"Player wins {win_amount} with a {best_player_hand.name}. And has total of {self.player.chips}.")
+            win_amount = Table.win_amount(player_hand, self.ante) + (self.player_bet * 2)
+            self.player.credit(win_amount)
+            print(f"Player wins {win_amount} with a {player_hand.name}. And has total of {self.player.chips}.")
 
-    def dealer_qualifies(self) -> bool:
-        if hand_resolver.is_pair_of_4_or_better(self.dealer_hand + self.community_cards):
-            return True
-        else:
-            hand = Hand(tuple(self.player_hand + self.community_cards))
-            ante_payoff = Table.win_amount(hand, self.ante)
-            self.player.credit(ante_payoff)
-            print("Dealer folds. Player wins.")
-            return False
-
-    def print_table(self) -> None:
+    def print_table(self, show_dealer_card: bool = False) -> None:
         print("Dealer:")
-        print(card_printer.ascii_version_of_hidden_card(self.dealer_hand))
+        if show_dealer_card:
+            print(card_printer.ascii_version_of_card(self.dealer_hand))
+        else:
+            print(card_printer.ascii_version_of_hidden_card(self.dealer_hand))
 
         print("Board")
         print(card_printer.ascii_version_of_card(self.community_cards))

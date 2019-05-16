@@ -62,19 +62,13 @@ def start_game():
         table.new_game()
         table.print_table()
 
-        if not table.dealer_qualifies():
-            time.sleep(2)
-            clear_screen()
-            continue
-
         flop_action = after_flop()
         if flop_action:
-            print(f"{p1.name} bets.")
             table.player_bets()
             table.draw_turn_card()
-            clear_print_sleep(table)
+            clear_print_sleep(table, False)
             table.draw_river_card()
-            clear_print_sleep(table)
+            clear_print_sleep(table, True)
             table.resolve_winner()
             time.sleep(3)
         else:
@@ -91,9 +85,9 @@ def start_game():
     print("Thank you for playing!")
 
 
-def clear_print_sleep(table: Table) -> None:
+def clear_print_sleep(table: Table, show_dealer_card: bool) -> None:
     clear_screen()
-    table.print_table()
+    table.print_table(show_dealer_card=show_dealer_card)
     time.sleep(2)
 
 
