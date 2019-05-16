@@ -1,4 +1,8 @@
+from typing import Type, TypeVar
+
 from colorama import Fore, Style
+
+T = TypeVar('T', bound='Card')
 
 
 class Card:
@@ -26,9 +30,10 @@ class Card:
         self.suit = suit
         self.rank = rank
         self.value = Card.values[rank]
+        self.hidden = False
 
     def __repr__(self) -> str:
-        return self.rank + self._colorized_suit
+        return 'X' if self.hidden else self.rank + self._colorized_suit
 
     def __lt__(self, other) -> bool:
         return self.value < other.value
@@ -36,3 +41,7 @@ class Card:
     @property
     def _colorized_suit(self) -> str:
         return Card.suit_colors[self.suit] + self.suit + Style.RESET_ALL
+
+    @classmethod
+    def of(cls: Type[T], rank_and_suit: str) -> T:
+        return cls(rank_and_suit[1], rank_and_suit[0])

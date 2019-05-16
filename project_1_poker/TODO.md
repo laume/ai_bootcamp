@@ -1,0 +1,11 @@
+- correctly implement Split case
+- check if dealer has 44 or better to continue playing
+- Implement Ante Table
+  - royal flush 100 to 1
+  - straight flush 20 to 1
+  - four of a kind 10 to 1
+  - full house 3 to 1, 
+  - flush 2 to 1
+  - straight or less the standard 1 to 1.
+- Implement side bet
+- Implement card visualisation
