@@ -55,18 +55,15 @@ class Table:
         bet_amount = Table.ante * 2
         if self.player.bet(bet_amount):
             self.pot += bet_amount * 2
-            time.sleep(2)
-
-            # deal Turn and River cards
-            turn_card = self.deck.deal_card()
-            self.community_cards.append(turn_card)
-            print(f"Turn card is {self.community_cards}")
             time.sleep(1)
 
-            river_card = self.deck.deal_card()
-            self.community_cards.append(river_card)
-            print(f"River card is {self.community_cards}")
-            time.sleep(1)
+    def draw_turn_card(self) -> None:
+        turn_card = self.deck.deal_card()
+        self.community_cards.append(turn_card)
+
+    def draw_river_card(self) -> None:
+        river_card = self.deck.deal_card()
+        self.community_cards.append(river_card)
 
     def player_folds(self) -> None:
         # do nothing yet

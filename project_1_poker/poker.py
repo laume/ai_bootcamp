@@ -71,6 +71,10 @@ def start_game():
         if flop_action:
             print(f"{p1.name} bets.")
             table.player_bets()
+            table.draw_turn_card()
+            clear_print_sleep(table)
+            table.draw_river_card()
+            clear_print_sleep(table)
             table.resolve_winner()
             time.sleep(3)
         else:
@@ -85,6 +89,12 @@ def start_game():
 
     clear_screen()
     print("Thank you for playing!")
+
+
+def clear_print_sleep(table: Table) -> None:
+    clear_screen()
+    table.print_table()
+    time.sleep(2)
 
 
 if __name__ == '__main__':
